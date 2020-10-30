@@ -1,14 +1,83 @@
 import pygame
 
-from .constants import ROW, COL, BLACK, WHITE, YELLOW_BACK, YELLOW_TOP, SQ_SIZE
+from .constants import *
 from .checker import Checker
 
 class Board:
-    
+    dir_arr = [(0, 1), (0, -1), (-1, 0), (1, 0), (1, 1), (-1, 1),(1, -1), (-1, -1)]
+
     def __init__(self):
         self.board = []
         self.white_left = self.black_left = ROW - 2
         self.create_board()
+
+    def is_inside(self, row, col):
+        return 0 <= row < ROW and 0 <= col < COL
+
+    def get_upto_border(self, checker, dir):
+        cnt = 0
+        x, y = checker.row, checker.col
+
+        while self.is_inside(x + dir[0], y + dir[1]) :
+            x += dir[0]
+            y += dir[1]
+            cnt += (self.board[x][y] is not None)
+        return cnt
+       
+
+    def num_checker_in_a_line(self, checker, dir):
+        neg_dir = (-dir[0], -dir[1])
+
+        return self.get_upto_border(checker, dir) + \
+            self.get_upto_border(checker, neg_dir) + 1
+
+
+    def can_go_in_this_dir(self, checker, dir):
+        # return None if not possible,
+        # otherwise return the pos
+        move_cnt = self.num_checker_in_a_line(checker, dir)
+        print("dir : {} , cnt : {}".format(dir, move_cnt))
+        itr = move_cnt
+        x, y = checker.row , checker.col
+        # check n - 1 adjacent moves
+        while itr > 1:
+            x, y = x + dir[0], y + dir[1]
+            
+            if not self.is_inside(x, y):
+                return None
+            else :
+                is_opponent = self.board[x][y] is not None and \
+                    self.board[x][y].color != checker.color
+
+                if is_opponent:
+                    return None
+        
+            itr -= 1
+
+        assert(itr == 1)
+
+        x, y = x + dir[0], y + dir[1]
+
+        if not self.is_inside(x, y):
+            return None
+        if self.board[x][y] is None : 
+            return (x, y)
+        if self.board[x][y].color == checker.color: # cannot sit on my guti 
+            return None     
+        return (x, y)
+
+
+        
+
+    def get_valid_moves(self, checker):
+        valid_moves = {}
+
+        for dir in self.dir_arr :
+            whr = self.can_go_in_this_dir(checker, dir) 
+            if whr is not None:
+                valid_moves[whr] = 1
+
+        return valid_moves
 
     def draw(self, surf):
         self.draw_grids(surf)
@@ -49,6 +118,8 @@ class Board:
 
 
     def move(self, piece, row, col):
+
+        self.board[row][col] = None
         x, y = piece.row, piece.col
         self.board[x][y] , self.board[row][col] = self.board[row][col], self.board[x][y]
         piece.move(row, col)
