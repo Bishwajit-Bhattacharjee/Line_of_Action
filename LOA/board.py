@@ -1,5 +1,6 @@
 import pygame
 
+from queue import Queue
 from .constants import *
 from .checker import Checker
 
@@ -117,13 +118,78 @@ class Board:
                         self.board[row].append(None)
 
 
-    def move(self, piece, row, col):
+    def move(self, fx, fy, tx, ty):
 
-        self.board[row][col] = None
-        x, y = piece.row, piece.col
-        self.board[x][y] , self.board[row][col] = self.board[row][col], self.board[x][y]
-        piece.move(row, col)
+        piece = self.get_checker(fx, fy)
+        self.board[tx][ty] = None
+        self.board[fx][fy] , self.board[tx][ty] = self.board[tx][ty], self.board[fx][fy]
+        piece.move(tx, ty)
 
 
     def get_checker(self, row, col):
         return self.board[row][col]
+    
+
+    def bfs(self, starting_checker):
+        # returns the size of connected comp of
+        # same color as starting_checker
+        vis = [ [False for c in range(COL)]
+                for r in range(ROW)]
+        sz = 1
+        q = Queue()
+        row, col = starting_checker.row, starting_checker.col
+        q.put((row, col))
+        vis[row][col] = True
+        while not q.empty():
+            cur_row, cur_col = q.get()
+            for dir in self.dir_arr :
+                nxt_row, nxt_col = cur_row + dir[0], cur_col + dir[1]
+                if not self.is_inside(nxt_row, nxt_col): continue
+                cur_checker = self.get_checker(nxt_row, nxt_col)
+                if cur_checker is None: 
+                    continue
+                if vis[nxt_row][nxt_col] or cur_checker.color != starting_checker.color: 
+                    continue            
+                sz += 1
+                q.put((nxt_row, nxt_col))
+                vis[nxt_row][nxt_col] = True
+
+        return sz
+
+
+    def winner(self, cur_turn):
+        st_black, st_white = (-1, -1), (-1, -1)
+        black_cnt, white_cnt = 0, 0
+        
+        for cur_row in self.board:
+            for cur_checker in cur_row:
+                if cur_checker is None : 
+                    continue
+                if cur_checker.color == BLACK:
+                    black_cnt += 1
+                    st_black = cur_checker
+                elif cur_checker.color == WHITE:
+                    white_cnt += 1
+                    st_white = cur_checker
+
+        assert(st_black is not None and st_white is not None)
+        assert(black_cnt > 0 and white_cnt > 0)
+
+        can_black_win = self.bfs(st_black) == black_cnt
+        can_white_win = self.bfs(st_white) == white_cnt
+
+        if can_black_win and can_white_win: 
+            return self.next_player(cur_turn)
+
+        if can_black_win: 
+            return BLACK
+        if can_white_win:
+            return WHITE
+        return None
+
+        
+    def next_player(self, cur_player):
+        if cur_player == WHITE : 
+            return BLACK
+        elif cur_player == BLACK :
+            return WHITE
