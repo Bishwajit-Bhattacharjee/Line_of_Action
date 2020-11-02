@@ -37,7 +37,7 @@ class Board:
         # return None if not possible,
         # otherwise return the pos
         move_cnt = self.num_checker_in_a_line(checker, dir)
-        print("dir : {} , cnt : {}".format(dir, move_cnt))
+        # print("dir : {} , cnt : {}".format(dir, move_cnt))
         itr = move_cnt
         x, y = checker.row , checker.col
         # check n - 1 adjacent moves

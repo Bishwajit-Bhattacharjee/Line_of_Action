@@ -1,6 +1,8 @@
 import os, sys
-import pygame
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 os.environ["DISPLAY"] = ":0.0"
+
+import pygame
 
 from LOA.game import Game
 from LOA.constants import *
@@ -34,10 +36,13 @@ def main(my_id):
 
         if cur_player != my_id:
             # ask for move
-            print("{}".format(cur_player), flush = True)
+            print(cur_player, flush = True)
 
             # take input from the console
-            fx, fy, tx, ty = map( input().split(), int) 
+            fx = int(input())
+            fy = int(input())
+            tx = int(input())
+            ty = int(input())
             
             game.ai_make_move(fx, fy, tx, ty)
             
@@ -59,7 +64,11 @@ def main(my_id):
                     if move_completed is not None: 
                         fx, fy, tx, ty = move_completed
                         print("{} {} {} {} {}".format(my_id, fx, fy, tx, ty), file = sys.stderr ,flush = True)
-                        print("{} {} {} {} {}".format(my_id, fx, fy, tx, ty), flush = True)
+                        print(my_id, flush = True)
+                        print(fx, flush = True)
+                        print(fy, flush = True)
+                        print(tx, flush = True)
+                        print(ty, flush = True)
 
                         if my_id == 1: cur_player = 2
                         else : cur_player = 1
@@ -68,6 +77,7 @@ def main(my_id):
     
 if __name__ == '__main__':
 
-    starting_player = int(sys.argv[1])    
+    starting_player = int(sys.argv[1])   
+    print("", end="", flush= True)
     print("{}".format(starting_player), file = sys.stderr, flush = True)
     main(starting_player)
