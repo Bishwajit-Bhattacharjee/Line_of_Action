@@ -82,7 +82,7 @@ struct State {
         assert(this->board[row][col] == this->cur_player);
         vector < Move > moves;
         for(int dir = 0; dir < 8; dir++){
-            PII what_pos = go_a_direction(row, col, dir);
+            PII what_pos = go_to_a_direction(row, col, dir);
 
             if(what_pos == PII(-1, -1)) continue;
             moves.emplace_back(row, col, what_pos.first, what_pos.second);
@@ -90,7 +90,7 @@ struct State {
         return moves;
     }
 
-    PII go_a_direction (int row, int col, int dir){
+    PII go_to_a_direction (int row, int col, int dir){
         PII target = PII(-1, -1); // flag to say you cannot go in this direction
         int cnt = get_count_in_a_line(row, col, dir); // line can horizontal, vertical, diagonal
 
@@ -124,7 +124,7 @@ struct State {
     }
 
     int get_count_till_border (int row, int col, const int ddx, const int ddy){
-        int cnt = 1;
+        int cnt = 0;
 
         while(is_inside_the_board( row + ddx , col + ddy) ){
             row += ddx, col += ddy;
@@ -138,7 +138,7 @@ struct State {
     }
 
     void print (){
-        ai_log << "Current player " << endl;
+        ai_log << "Current player " << this->cur_player << endl;
         for(int r = 0; r < this->row_count; r++){
             for(int c = 0; c < this->col_count; c++){
                 ai_log << this->board[r][c] << " ";
@@ -168,22 +168,29 @@ struct State {
 
     void make_random_move(){
         PII empty = {-1, -1}, ai = {-1, -1};
-        for(int i = 0; i < this->row_count; i++){
-            for(int j = 0; j < this->col_count ; j++){
-                if(board[i][j] == 0) empty = {i,j};
-                else if(board[i][j] == AI_ID) ai = {i, j};
-            }
-        }
-        board[empty.first][empty.second] = board[ai.first][ai.second];
-        board[ai.first][ai.second] = 0;
+
+        vector < Move > valid_moves = get_possible_moves();
+        Move random_move = valid_moves[ rand() % valid_moves.size() ];
+
+        this->handle_an_ai_move(random_move); 
+    }
+
+    void handle_an_ai_move (const Move &move){
+        assert(board[move.fx][move.fy] == AI_ID);
+
+        board[move.tx][move.ty] = board[move.fx][move.fy];
+        board[move.fx][move.fy] = 0;
 
         this->rotate_move();
 
-        cout << ai.first << endl;
-        cout << ai.second << endl; 
-        cout << empty.first << endl; 
-        cout << empty.second << endl; 
-        
+        cout << move.fx << endl;
+        cout << move.fy << endl;
+        cout << move.tx << endl;
+        cout << move.ty << endl;
+
+        // Debug 
+        ai_log << "Move : " ;
+        ai_log << move.fx << " " << move.fy << " " << move.tx << " " << move.ty << endl;
     }
 
     void handle_an_hooman_move (const int &fx, const int &fy, const int &tx, const int &ty) {
@@ -197,7 +204,8 @@ struct State {
 
 
 int main(int argc, char** argv){
-    
+    srand(time(NULL));
+
     ai_log.open("ai_log.txt", ios::out);
 
     // getline(cin, s);
@@ -222,7 +230,7 @@ int main(int argc, char** argv){
         cerr << "cpp player " << which_player << endl;
 
         if(which_player == AI_ID){
-            game.next_moves_debug();
+            // game.next_moves_debug();
             game.make_random_move();
             cur = ( AI_ID == 2)? 1 : 2;                
         }
