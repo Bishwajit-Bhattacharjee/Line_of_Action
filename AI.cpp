@@ -2,13 +2,10 @@
 using namespace std;
 using PII = pair<int,int>;
 int AI_ID;
-
+ofstream ai_log;
 int dx[] = {0, 1, 1, 1, 0, -1, -1, -1};
 int dy[] = {-1, -1, 0, 1, 1, 1, 0, -1};
 
-ofstream ai_log;
-
- 
 struct Move {
     int fx, fy, tx, ty;
     Move (const int _fx, const int _fy, const int _tx, const int _ty){
@@ -19,6 +16,9 @@ struct Move {
     }
     Move (){}
 };
+
+Move best_move;
+int dep = 4;
 
 struct State {
 
@@ -52,7 +52,8 @@ struct State {
         this->board = state.board;
         this->row_count = state.row_count;
         this->col_count = state.col_count;
-        this->rotate_move(); // expecting this will be called by alternating player
+        this->cur_player = state.cur_player;
+        // this->rotate_move(); // expecting this will be called by alternating player
     }
 
     void rotate_move(){
@@ -158,7 +159,7 @@ struct State {
     }
 
 
-    int winner(){
+    int winner (){
         int one_count = 0, two_count = 0;
         PII one_pos = PII(-1, -1), two_pos = PII(-1, -1);
 
@@ -215,31 +216,33 @@ struct State {
         }
     } 
 
-    void make_random_move(){
-        PII empty = {-1, -1}, ai = {-1, -1};
+    void make_random_move (){
+        best_move = Move(-1, -1, -1, -1);
+        int max_found = minimax(*this, INT_MIN, INT_MAX, dep);
+        ai_log << " VALUE FOUND : " << max_found << endl;
+        ai_log << best_move.fx << " " << best_move.fy << " " << best_move.tx << " " << best_move.ty << endl; 
 
-        vector < Move > valid_moves = get_possible_moves();
-        Move random_move = valid_moves[ rand() % valid_moves.size() ];
-
-        this->handle_an_ai_move(random_move); 
+        this->handle_an_ai_move(best_move); 
     }
 
-    void handle_an_ai_move (const Move &move){
-        assert(board[move.fx][move.fy] == AI_ID);
+    void handle_an_ai_move (const Move &move, bool should_print = true) {
+        assert(this->board[move.fx][move.fy] == AI_ID && this->board[move.tx][move.ty]);
 
         board[move.tx][move.ty] = board[move.fx][move.fy];
         board[move.fx][move.fy] = 0;
 
         this->rotate_move();
 
-        cout << move.fx << endl;
-        cout << move.fy << endl;
-        cout << move.tx << endl;
-        cout << move.ty << endl;
+        if (should_print){
+            cout << move.fx << endl;
+            cout << move.fy << endl;
+            cout << move.tx << endl;
+            cout << move.ty << endl;
 
+            ai_log << "Move : " ;
+            ai_log << move.fx << " " << move.fy << " " << move.tx << " " << move.ty << endl;
+        }
         // Debug 
-        ai_log << "Move : " ;
-        ai_log << move.fx << " " << move.fy << " " << move.tx << " " << move.ty << endl;
     }
 
     void handle_an_hooman_move (const int &fx, const int &fy, const int &tx, const int &ty) {
@@ -250,7 +253,56 @@ struct State {
 
 };
 
+int eval_func (State &state) {
+    return rand() % 120;
+}
 
+int minimax (State state, int alpha, int beta, int depth) {
+
+    int winner = state.winner();
+    if (winner != 0) {
+        if (winner == AI_ID ) return 1e8 ;
+        else return -1e8;
+    }
+    if (depth == 0) {
+        return eval_func(state);
+    }
+    if (state.cur_player == AI_ID ) { // maximizing player
+        int max_val = INT_MIN;
+        vector < Move > moves = state.get_possible_moves();
+
+        for (auto move : moves){
+            State child(state);
+            child.handle_an_ai_move(move, false);
+            assert (child.cur_player != state.cur_player);
+            int cur = minimax (child, alpha, beta, depth - 1);
+
+            if (cur > max_val and depth == dep) {
+                best_move = move;
+            }
+
+            max_val = max (max_val, cur);
+            alpha = max (alpha, cur);
+            if (beta <= alpha) break;
+        }
+        return max_val;        
+    }
+    else {
+        int min_val = INT_MAX;
+        vector < Move > moves = state.get_possible_moves();
+
+        for (auto move : moves){
+            State child(state);
+            child.handle_an_ai_move(move, false);
+            assert (child.cur_player != state.cur_player);
+            int cur = minimax (child, alpha, beta, depth - 1);
+            min_val = min (min_val, cur);
+            beta = min (beta, cur);
+            if (beta <= alpha) break;
+        }
+        return min_val;        
+    }
+}
 
 int main(int argc, char** argv){
     srand(time(NULL));
