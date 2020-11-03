@@ -5,3 +5,49 @@ Current player 1
 2 0 0 0 0 2 
 2 0 0 0 0 2 
 0 1 1 1 1 0 
+ VALUE FOUND : 12
+1 0 1 2
+Move : 1 0 1 2
+ VALUE FOUND : 13
+2 5 2 2
+Move : 2 5 2 2
+ VALUE FOUND : 16
+2 0 0 2
+Move : 2 0 0 2
+ VALUE FOUND : 22
+3 0 4 1
+Move : 3 0 4 1
+ VALUE FOUND : 15
+4 0 5 0
+Move : 4 0 5 0
+ VALUE FOUND : 17
+1 5 2 4
+Move : 1 5 2 4
+ VALUE FOUND : 14
+2 2 5 2
+Move : 2 2 5 2
+ VALUE FOUND : 7
+5 2 2 2
+Move : 5 2 2 2
+ VALUE FOUND : 8
+5 0 3 2
+Move : 5 0 3 2
+ VALUE FOUND : 10
+3 2 3 3
+Move : 3 2 3 3
+ VALUE FOUND : 23
+0 2 3 2
+Move : 0 2 3 2
+ VALUE FOUND : 100000000
+4 5 3 5
+Move : 4 5 3 5
+ VALUE FOUND : 100000000
+3 2 4 3
+Move : 3 2 4 3
+ VALUE FOUND : 100000000
+3 5 4 5
+Move : 3 5 4 5
+ VALUE FOUND : 100000000
+4 3 3 4
+Move : 4 3 3 4
+BODDA 2 jiti gese 

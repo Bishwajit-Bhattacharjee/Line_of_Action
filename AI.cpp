@@ -216,9 +216,62 @@ struct State {
         }
     } 
 
+    int eval_func () {
+        return rand() % 120;
+    }
+
+    int minimax (int alpha, int beta, int depth) {
+
+        int winner = this->winner();
+        if (winner != 0) {
+            if (winner == AI_ID ) return 1e8 ;
+            else return -1e8;
+        }
+        if (depth == 0) {
+            return this->eval_func();
+        }
+        if (this->cur_player == AI_ID ) { // maximizing player
+
+            int max_val = INT_MIN;
+            vector < Move > moves = this->get_possible_moves();
+
+            for (auto move : moves){
+                State child(*this);
+                child.handle_an_ai_move(move, false);
+                assert (child.cur_player != this->cur_player);
+                int cur = child.minimax (alpha, beta, depth - 1);
+
+                if (cur > max_val and depth == dep) {
+                    best_move = move;
+                }
+
+                max_val = max (max_val, cur);
+                alpha = max (alpha, cur);
+                if (beta <= alpha) break;
+            }
+            return max_val;        
+        }
+        else {
+            int min_val = INT_MAX;
+            vector < Move > moves = this->get_possible_moves();
+
+            for (auto move : moves){
+                State child(*this);
+                child.handle_an_ai_move(move, false);
+                assert (child.cur_player != this->cur_player);
+                int cur = child.minimax (alpha, beta, depth - 1);
+                min_val = min (min_val, cur);
+                beta = min (beta, cur);
+                if (beta <= alpha) break;
+            }
+            return min_val;        
+        }
+    }
+
+
     void make_random_move (){
         best_move = Move(-1, -1, -1, -1);
-        int max_found = minimax(*this, INT_MIN, INT_MAX, dep);
+        int max_found = this->minimax(INT_MIN, INT_MAX, dep);
         ai_log << " VALUE FOUND : " << max_found << endl;
         ai_log << best_move.fx << " " << best_move.fy << " " << best_move.tx << " " << best_move.ty << endl; 
 
@@ -226,7 +279,7 @@ struct State {
     }
 
     void handle_an_ai_move (const Move &move, bool should_print = true) {
-        assert(this->board[move.fx][move.fy] == AI_ID && this->board[move.tx][move.ty]);
+        // assert(this->board[move.fx][move.fy] == this->cur_player && !this->board[move.tx][move.ty]);
 
         board[move.tx][move.ty] = board[move.fx][move.fy];
         board[move.fx][move.fy] = 0;
@@ -253,56 +306,7 @@ struct State {
 
 };
 
-int eval_func (State &state) {
-    return rand() % 120;
-}
 
-int minimax (State state, int alpha, int beta, int depth) {
-
-    int winner = state.winner();
-    if (winner != 0) {
-        if (winner == AI_ID ) return 1e8 ;
-        else return -1e8;
-    }
-    if (depth == 0) {
-        return eval_func(state);
-    }
-    if (state.cur_player == AI_ID ) { // maximizing player
-        int max_val = INT_MIN;
-        vector < Move > moves = state.get_possible_moves();
-
-        for (auto move : moves){
-            State child(state);
-            child.handle_an_ai_move(move, false);
-            assert (child.cur_player != state.cur_player);
-            int cur = minimax (child, alpha, beta, depth - 1);
-
-            if (cur > max_val and depth == dep) {
-                best_move = move;
-            }
-
-            max_val = max (max_val, cur);
-            alpha = max (alpha, cur);
-            if (beta <= alpha) break;
-        }
-        return max_val;        
-    }
-    else {
-        int min_val = INT_MAX;
-        vector < Move > moves = state.get_possible_moves();
-
-        for (auto move : moves){
-            State child(state);
-            child.handle_an_ai_move(move, false);
-            assert (child.cur_player != state.cur_player);
-            int cur = minimax (child, alpha, beta, depth - 1);
-            min_val = min (min_val, cur);
-            beta = min (beta, cur);
-            if (beta <= alpha) break;
-        }
-        return min_val;        
-    }
-}
 
 int main(int argc, char** argv){
     srand(time(NULL));
