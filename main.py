@@ -23,18 +23,18 @@ def main(my_id):
     run = True
     clock = pygame.time.Clock()
     game = Game(WIN)
-    
+    has_won = False 
 
     while run:
         clock.tick(FPS)
 
         winner = game.winner()
+
         if winner is not None:
             print(str(winner) + " won the match")
-            run = False
-            break
+            has_won = True
 
-        if cur_player != my_id:
+        if not has_won and cur_player != my_id:
             # ask for move
             print(cur_player, flush = True)
 
@@ -52,7 +52,7 @@ def main(my_id):
                 if event.type == pygame.QUIT:
                     run = False
             
-        else :
+        elif not has_won :
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -72,7 +72,10 @@ def main(my_id):
 
                         if my_id == 1: cur_player = 2
                         else : cur_player = 1
-                
+
+        if has_won :
+            while True : 
+                game.update()                
         game.update()
     
 if __name__ == '__main__':

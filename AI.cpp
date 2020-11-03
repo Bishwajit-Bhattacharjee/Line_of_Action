@@ -216,17 +216,42 @@ struct State {
         }
     } 
 
+    int density_heuristic () {
+        int tot_x[3] = {0, 0, 0}, cnt[] = {0, 0, 0}, tot_y[] = {0, 0, 0};
+
+        for (int r = 0; r < row_count; r++) {
+            for (int c = 0; c < col_count; c++) {
+                int el = this->board[r][c];
+                cnt[el]++, tot_x[el] += r , tot_y[el] += c;
+            }
+        }
+        int c_o_m_x[3] , c_o_m_y[3] ;
+        for(int i = 1; i < 3; i++) 
+            c_o_m_x[i] = tot_x[i] / cnt[i] , c_o_m_y[i] = tot_y[i] / cnt[i];
+
+        int d[] = {0, 0, 0};
+        for (int r = 0; r < row_count; r++){
+            for (int c = 0; c < col_count; c++) {
+                int el = this->board[r][c];
+                d[el] += max( abs(c_o_m_x[el] - r) , abs(c_o_m_y[el] - c) );
+            }
+        }
+        int not_ai_id = ( AI_ID == 1)? 2 : 1;
+        return -d[AI_ID] + d[not_ai_id];
+    }
+
     int eval_func () {
-        return rand() % 120;
+        return density_heuristic();
     }
 
     int minimax (int alpha, int beta, int depth) {
 
         int winner = this->winner();
         if (winner != 0) {
-            if (winner == AI_ID ) return 1e8 ;
-            else return -1e8;
+            if (winner == AI_ID ) return depth * 1e8;
+            else return -depth * 1e8;
         }
+
         if (depth == 0) {
             return this->eval_func();
         }
