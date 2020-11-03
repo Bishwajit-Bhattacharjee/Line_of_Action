@@ -1,11 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 using PII = pair<int,int>;
-int const R = 6;
-int const C = 6;
 int AI_ID;
-
-int board[R][C];
 
 int dx[] = {0, 1, 1, 1, 0, -1, -1, -1};
 int dy[] = {-1, -1, 0, 1, 1, 1, 0, -1};
@@ -137,6 +133,59 @@ struct State {
         return row >= 0 and row < this->row_count and col >= 0 and col < this->col_count;
     }
 
+    int bfs (PII src) {
+        int sz = 1;
+        vector < vector < bool > > vis( this->row_count, vector<bool> (this->col_count, false));
+        queue < PII > q;
+
+        vis[src.first][src.second] = 1;
+        q.push(src);
+        
+        while (q.size()) {
+            PII front = q.front(); q.pop();
+            for (int dir = 0; dir < 8; dir++) {
+                int x = front.first + dx[dir];
+                int y = front.second + dy[dir];
+
+                if (!is_inside_the_board (x, y) ) continue;
+                if (vis[x][y] or this->board[x][y] != this->board[src.first][src.second]) continue;
+                sz++;
+                q.push({x,y});
+                vis[x][y] = 1;
+            }
+        }
+        return sz;
+    }
+
+
+    int winner(){
+        int one_count = 0, two_count = 0;
+        PII one_pos = PII(-1, -1), two_pos = PII(-1, -1);
+
+        for (int r = 0; r < this->row_count; r++){
+            for (int c = 0; c < this->col_count; c++){
+                int el = this->board[r][c];
+                if (el == 0) continue;
+                else if (el == 1) one_count++, one_pos = PII(r, c);
+                else if (el == 2) two_count++, two_pos = PII(r, c);
+            }
+        }
+        assert(one_count >= 1 && two_count >= 1);
+
+        int one_comp_size = bfs(one_pos);
+        int two_comp_size = bfs(two_pos);
+        
+        bool one_can_win = (one_comp_size == one_count);
+        bool tow_can_win = (two_comp_size == two_count);
+
+        if(one_can_win && tow_can_win){
+            return (this->cur_player == 1? 2 : 1);
+        }
+        if(one_can_win) return 1;
+        if(tow_can_win) return 2;
+        return 0;
+    }
+
     void print (){
         ai_log << "Current player " << this->cur_player << endl;
         for(int r = 0; r < this->row_count; r++){
@@ -208,38 +257,37 @@ int main(int argc, char** argv){
 
     ai_log.open("ai_log.txt", ios::out);
 
-    // getline(cin, s);
-    // getline(cin, s);
-
     cerr << "argc : " << argc << endl;
     int ROW, COL;
     ROW = atoi(argv[1]);
     COL = atoi(argv[2]);
-
     AI_ID = atoi(argv[3]);
+
     cerr << ROW << " " << COL << " " << AI_ID << endl;
     int cur = 1;
     State game = State(ROW, COL, 1);
 
     game.print();
 
-    while(true){
+    while (true){
 
         int which_player;
         cin >> which_player;
         cerr << "cpp player " << which_player << endl;
 
-        if(which_player == AI_ID){
+        if ( game.winner() != 0) {
+            ai_log << "BODDA " << game.winner() << " jiti gese " << endl;    
+            exit(0);
+        }
+
+        if (which_player == AI_ID){
             // game.next_moves_debug();
             game.make_random_move();
-            cur = ( AI_ID == 2)? 1 : 2;                
         }
         else {
             int fx, fy, tx, ty;
             cin >> fx >> fy >> tx >> ty;
-            cerr << "cpp " << fx << " " << fy << " " << tx << " " << ty << endl;
             game.handle_an_hooman_move(fx, fy, tx, ty);
-            cur = AI_ID;            
         }
     }
     

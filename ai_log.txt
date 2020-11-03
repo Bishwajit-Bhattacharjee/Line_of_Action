@@ -5,8 +5,9 @@ Current player 1
 2 0 0 0 0 2 
 2 0 0 0 0 2 
 0 1 1 1 1 0 
-Move : 3 0 3 2
 Move : 2 5 0 3
-Move : 1 0 1 2
-Move : 3 2 2 3
-Move : 0 3 2 1
+Move : 3 0 3 3
+Move : 2 0 2 2
+Move : 4 5 3 4
+Move : 3 3 5 5
+BODDA 1 jiti gese 
