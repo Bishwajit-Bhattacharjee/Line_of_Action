@@ -1,31 +1,16 @@
 Current player 1
-0 1 1 1 1 0 
-2 0 0 0 0 2 
-2 0 0 0 0 2 
-2 0 0 0 0 2 
-2 0 0 0 0 2 
-0 1 1 1 1 0 
- VALUE FOUND : -2
-1 0 1 2
-Move : 1 0 1 2
- VALUE FOUND : -2
-2 0 2 2
-Move : 2 0 2 2
+0 1 1 1 1 1 1 0 
+2 0 0 0 0 0 0 2 
+2 0 0 0 0 0 0 2 
+2 0 0 0 0 0 0 2 
+2 0 0 0 0 0 0 2 
+2 0 0 0 0 0 0 2 
+2 0 0 0 0 0 0 2 
+0 1 1 1 1 1 1 0 
  VALUE FOUND : -1
-1 5 1 3
-Move : 1 5 1 3
- VALUE FOUND : -1
-2 5 3 4
-Move : 2 5 3 4
- VALUE FOUND : 1
-3 0 4 1
-Move : 3 0 4 1
+0 1 2 3
+Requiured time : 3.75164
+Move : 0 1 2 3
  VALUE FOUND : 2
-4 0 4 3
-Move : 4 0 4 3
- VALUE FOUND : 100000000
-4 1 4 4
-Move : 4 1 4 4
- VALUE FOUND : 300000000
-2 2 2 3
-Move : 2 2 2 3
+-1 -1 -1 -1
+Requiured time : 2.25173

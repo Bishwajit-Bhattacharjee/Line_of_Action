@@ -18,7 +18,7 @@ struct Move {
 };
 
 Move best_move;
-int dep = 4;
+int dep = 6;
 
 struct State {
 
@@ -296,10 +296,12 @@ struct State {
 
     void make_random_move (){
         best_move = Move(-1, -1, -1, -1);
+        clock_t start_time = clock();
+
         int max_found = this->minimax(INT_MIN, INT_MAX, dep);
         ai_log << " VALUE FOUND : " << max_found << endl;
         ai_log << best_move.fx << " " << best_move.fy << " " << best_move.tx << " " << best_move.ty << endl; 
-
+        ai_log << "Requiured time : " <<  1.0 * (clock() - start_time) / CLOCKS_PER_SEC << endl;
         this->handle_an_ai_move(best_move); 
     }
 
@@ -331,7 +333,10 @@ struct State {
 
 };
 
-
+void set_depth (const int &row, const int &col) {
+    if (row == 6) dep = 6;
+    else dep = 5;
+}
 
 int main(int argc, char** argv){
     srand(time(NULL));
@@ -345,6 +350,7 @@ int main(int argc, char** argv){
     AI_ID = atoi(argv[3]);
 
     cerr << ROW << " " << COL << " " << AI_ID << endl;
+
     int cur = 1;
     State game = State(ROW, COL, 1);
 
@@ -357,7 +363,8 @@ int main(int argc, char** argv){
         cerr << "cpp player " << which_player << endl;
 
         if ( game.winner() != 0) {
-            ai_log << "BODDA " << game.winner() << " jiti gese " << endl;    
+            ai_log << "BODDA " << game.winner() << " jiti gese " << endl;
+            ai_log.close();
             exit(0);
         }
 

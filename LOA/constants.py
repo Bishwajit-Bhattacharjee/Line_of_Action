@@ -1,5 +1,5 @@
 
-ROW, COL = 6, 6
+ROW, COL = 8, 8
 WIDTH , HEIGHT = 600, 600
 SQ_SIZE = WIDTH // ROW
 
